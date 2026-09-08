@@ -1,143 +1,93 @@
-# MiniTower QA —— 游戏数值质量保障作品集项目（W1–W6 全部完成，审查通过 v0.5.1）
+# MiniTower QA —— 塔防数值引擎的质量保障体系（游戏测试作品集）
 
-> **一句话**：自研轻量塔防数值引擎 **MiniTower** 及其质量保障体系。
-> 简历叙事：把「会测 Web 的测试」升级为「懂游戏、会用数据说话的游戏测试」——
-> 对标鹰角网络「游戏测试」校招 JD 的 功能 / **数值** / **性能** / 自动化 / **AI 辅助** 能力面。
-> 规则设计全部原创（玩法框架致敬塔防品类），不涉及任何游戏素材或协议，可放心面试展示。
+> **MiniTower QA** 是一套可完整运行、结论可复现的**游戏数值质量保障体系**作品集：
+> 以自研轻量塔防数值引擎（纯 Python、headless、JSON 数据驱动、seed 逐事件可复现）为被测对象，
+> 覆盖 需求条目化 → 用例设计 → 自动化 → 蒙特卡洛与假设检验 → 性能基线 → SQL 数据反哺 → AI 辅助校验 的
+> 全链路，并在其上完整演练了「发现缺陷 → 定位根因 → 给出可执行修复建议 → 回归验证」的闭环。
 
-> 🔗 GitHub：https://github.com/Oxob-hue/mini-tower-qa（作品集仓库）
-> 🎯 面向招聘：先看 [docs/jd-review.md](docs/jd-review.md)（逐条对照岗位 JD）→
-> [docs/SHOWCASE.md](docs/SHOWCASE.md)（产物全景展示）→ 79 条测试全部可现场复跑
+> 关键数字（全部可在本仓库复跑）：**79 条自动化用例** · 招募概率 **200 万抽**假设检验 ·
+> **3600 局**模拟落库与 SQL 分析 · 单局 **0.09ms** 性能基准 · 调参案例给出 **atk ≥ 109** 可执行区间。
 
 ---
 
-## 为什么是塔防？
+## 内容速览
 
-鹰角是塔防赛道最具代表性的厂商（《明日方舟》）。塔防天然具备
-**可数值化的规则系统**（伤害公式、防御结算、技能触发、波次生成、三星条件），
-是「用测试与统计验证数值」的最佳题材——这正是通用 Web 测试简历里最稀缺的能力。
+| 想了解 | 看这里 |
+|---|---|
+| 被测对象规则与 13 个需求域 | [docs/requirements.md](docs/requirements.md) |
+| 用例 ↔ 需求 追踪矩阵 | [docs/test-case-matrix.md](docs/test-case-matrix.md) |
+| 缺陷复盘（红 → 根因 → 修复 → 回归） | [docs/defects.md](docs/defects.md) |
+| 真实数据报告（SQL / 性能 / AI） | [docs/w3-report.md](docs/w3-report.md) · [w4-report.md](docs/w4-report.md) · [w5-report.md](docs/w5-report.md) |
+| 产物全景与演示流程 | [docs/SHOWCASE.md](docs/SHOWCASE.md) |
+| 项目质量审查 | [docs/review-report.md](docs/review-report.md) |
 
-## 当前状态（W1–W6 全部完成 ✅，79 条测试全绿）
+## 为什么选择"塔防数值引擎"作为被测对象
 
-- ✅ 需求说明书（13 个需求域 REQ-CFG/DMG/SKL/TGT/STG/SIM/BAL/PRB/ANL/DATA/PERF/AI/CI）
-- ✅ W1 引擎核心 + 确定性 + 冒烟 12 条（真实缺陷 BUG-001 修复）
-- ✅ W2 规则/边界用例矩阵 20 条 + 缺陷复盘 BUG-002/003
-- ✅ W3 数值三件套 + 数据层 26 条（概率假设检验 / 平衡回归 / 膨胀校验 / SQLite + 6 SQL）
-- ✅ W4 性能与调参 10 条（基准 0.09–0.19ms/局、伸缩比 9.9、baseline 防回归、调参故事线）
-- ✅ W5 AI 辅助 + CI 11 条（三道闸：schema / 引擎交叉验证 / 审计；每日回归 GitHub Actions）
-- ✅ W6 收尾：Allure 报告接入（pytest.ini + tests/conftest.py 层级映射）、演示视频脚本、
-  简历/面试工具包（`docs/w6-*.md`）
-- ✅ 审查通过（v0.5.1）：静态扫描清理 5 处未用导入、Allure 报告已生成于 `allure-report/`
-  （79/79 passed），审查报告 `docs/review-report.md`
-- ✅ 自带测试环境 `.venv`（pytest 9.1.1 + pytest-xdist + allure-pytest）：开箱即用 pytest
-  marker 筛选与 allure-pytest 报告；引擎/测试本体仍零第三方依赖（stdlib unittest 可全量回归）
-- 追踪矩阵：`docs/test-case-matrix.md`；里程碑报告：`docs/w3-report.md`~`docs/w6-*.md`
+塔防/肉鸽品类天然具备**可数值化的规则系统**——伤害公式与防御结算、暴击乘区、技能触发节奏、
+索敌规则、波次生成、保底与克制设计、三星/胜负条件——每一类都适合用"测试与统计"去验证，
+也最能体现游戏测试岗位需要的**数值测试**能力。
+
+设计原则：
+
+- **确定性**：唯一随机源为暴击判定且受 seed 控制 → 每一条统计结论都可逐事件复现；
+- **数据驱动**：干员/敌人/关卡/招募全部 JSON 外置，改一行配置即一次可回归的数值改动；
+- **黄金样本先行**：用例期望值来自需求文档手工推导，而非看实现抄写；
+- **可复跑交付**：79 条测试 + 各报告脚本一条命令运行。
+
+## 当前状态（79/79 测试全绿）
+
+- 测试组成：冒烟 12 · 规则/边界 20 · 概率 10 · 平衡/膨胀 10 · 数据层 6 · 性能 6 · 调参 4 · AI 11（`tests/`）
+- 运行器：stdlib `unittest` 零依赖全量回归；`.venv`（pytest + allure-pytest）用于 marker 筛选与 Allure 报告
+- 环境：`.venv` 已就绪；`allure-report/` 可在本地生成（见 [w6-allure-guide.md](docs/w6-allure-guide.md)，HTML 需以 HTTP 方式打开）
+- 版本：0.5.1（变更记录见 [requirements.md](docs/requirements.md) 文末）
 
 ## 目录结构
 
 ```
 mini-tower-qa/
-├── docs/
-│   ├── requirements.md          # 需求说明书（13 域条目编号，测试断言引用出处）
-│   ├── test-case-matrix.md      # 用例-需求追踪矩阵（RTM，W1~W5）
-│   ├── defects.md               # 缺陷复盘（BUG-001~003）
-│   ├── review-report.md         # 项目审查报告（v0.5.1）
-│   ├── w3-report.md / w4-report.md / w5-report.md   # 真实数据报告
-│   ├── w6-allure-guide.md       # Allure 报告生成指南
-│   ├── w6-demo-script.md        # 2–3 分钟演示视频脚本
-│   ├── w6-interview-kit.md      # 简历条目 / 15 条追问应答 / 行为准备
-│   ├── jd-review.md             # 按招聘信息逐条对照审查
-│   ├── internship-pack.md       # 实习版简历摘要 + 执行导向话术 + 项目深度讲解
-│   └── SHOWCASE.md              # 产物全景展示（文件清单/真实数字/展示流程）
-├── mini_tower/                  # 被测对象 SUT（纯 Python，无第三方依赖）
-│   ├── models.py                #   数据模型（逻辑与数据分离）
-│   ├── loader.py                #   JSON 加载 + 域校验（坏配置加载期拒绝）
-│   ├── combat.py                #   战斗引擎（伤害/技能/索敌/波次/三星）
-│   ├── simulator.py             #   单局/批量统计 + 干员伤害占比聚合
-│   ├── recruit.py               #   招募概率系统（保底/软保底，seed 可复现）
-│   ├── stats.py                 #   统计工具（χ² 拟合优度、二项 CI，纯 stdlib）
-│   ├── analysis.py              #   数值分析（理论 DPS/膨胀比/克制比）
-│   ├── db.py                    #   SQLite 落库与查询层
-│   ├── perf.py                  #   性能基准/伸缩曲线/基线比对（REQ-PERF）
-│   ├── ai.py                    #   AI 辅助三条线 + 三道闸（schema/引擎交叉验证/审计）
-│   ├── cli.py                   #   headless 命令行入口
-│   └── data/                    #   全部数值配置（改一行 = 一次数值改动）
-│       ├── operators.json       #   干员
-│       ├── enemies.json         #   敌人
-│       ├── stages.json          #   关卡（波次/生命/三星线）
-│       └── recruit.json         #   招募池（概率/保底规则）
-├── .github/workflows/
-│   └── daily-balance.yml        # 每日 02:00 UTC 全量测试 + 平衡回归 + 产物归档
-├── sql/
-│   └── analysis.sql             # 6 条平衡/概率分析查询（Q1~Q6）
-├── scripts/
-│   ├── export_allure.py         # Allure 结果导出器（无 pytest，纯 stdlib）
-│   ├── w3_report.py             # 模拟/招募 → SQLite → SQL 回放（报告生成）
-│   ├── w4_bench.py              # 性能基线生成/比对（baseline.json）
-│   ├── w4_tune_demo.py          # 「改数值→红→调参→绿」故事线演示
-│   ├── w5_ai_demo.py            # AI 三条线 + 三道闸演示
-│   └── ci_daily_balance.py      # 每日平衡回归 + 漂移检测（退出码驱动 CI）
-├── results/                     # 运行产物（w3.db 等，不入库）
-├── .venv/                       # 自带 pytest/allure-pytest 环境（Python venv，不入库）
-├── allure-results/              # Allure 原始结果（可再生成，不入库）
-├── allure-report/               # Allure HTML 报告（已生成：79/79 passed，不入库）
-└── tests/
-    ├── allure_map.py            # 测试类 → epic/feature/marker 单一来源（conftest 与导出器共用）
-    ├── conftest.py              # pytest 钩子：Allure 层级/标记映射（无 allure 时静默）
-    ├── test_smoke.py            # W1 冒烟（12 条）
-    ├── test_rules.py            # W2 规则/边界用例矩阵（20 条）
-    ├── test_probability.py      # W3 概率域（10 条）
-    ├── test_balance.py          # W3 平衡/膨胀（10 条）
-    ├── test_db.py               # W3 数据层（6 条）
-    ├── test_perf.py             # W4 性能守卫/伸缩/基线机制（6 条）
-    ├── test_tuning.py           # W4 调参故事线回归（4 条）
-    ├── test_ai.py               # W5 AI 三道闸（11 条）
-    └── fixtures/bad_config/     # 坏配置夹具（验证加载期拦截）
-
-pytest.ini                          # 标记注册（smoke/rules/probability/balance/data/perf/tuning/ai）
+├── docs/                          # 需求说明书 / 追踪矩阵 / 缺陷复盘 / 数据报告 / 导览
+├── mini_tower/                    # 被测对象 SUT（纯 Python，无第三方运行时依赖）
+│   ├── models.py · loader.py · combat.py · simulator.py
+│   ├── recruit.py · stats.py · analysis.py
+│   ├── db.py · perf.py · ai.py · cli.py
+│   └── data/                      # operators / enemies / stages / recruit JSON 配置
+├── sql/analysis.sql               # 6 条平衡/概率分析查询
+├── scripts/                       # 报告与演示脚本（w3_report / w4_bench / w4_tune_demo / w5_ai_demo / ci_daily_balance / export_allure）
+├── tests/                         # 79 条用例（8 个测试文件 + conftest/allure_map）
+├── .github/workflows/daily-balance.yml   # 每日定时全量回归 + 平衡漂移检测
+├── results/ · allure-results/ · allure-report/ · .venv/   # 运行产物（gitignore）
+└── pytest.ini                     # marker 注册
 ```
 
 ## 快速开始
 
 ```bash
-# 1) 演示模式：参考编队通关 + 确定性校验 + 批量吞吐（无需任何安装）
+# 0) 进入项目目录（模块基于当前目录导入）
+cd D:\GameProtect\mini-tower-qa
+
+# 1) 引擎演示：3 个参考场景 + 确定性校验
 python -m mini_tower
 
-# 2) 指定一局
-python -m mini_tower --stage 1-2 --team sniper_a,caster_c,storm_d,frost_f --seed 42
+# 2) 全量测试（79 条，两条运行器等价）
+python -m unittest discover -s tests
+.venv\Scripts\python.exe -m pytest tests -q
 
-# 3) 批量统计（W3 平衡断言的雏形：通关率/三星率/耗时分布）
-python -m mini_tower --stage 1-2 --team sniper_a,caster_c,storm_d,frost_f --rounds 200
-
-# 4) 测试（两套运行器等价）
-python -m unittest discover -s tests -v               # stdlib（零依赖）
-#    全量 79 条 = 12 冒烟 + 20 规则 + 10 概率 + 10 平衡 + 6 数据层 + 6 性能 + 4 调参 + 11 AI
-.venv\Scripts\python.exe -m pytest tests -q           # pytest（仓库自带 .venv，含 allure-pytest）
-.venv\Scripts\python.exe -m pytest tests -m balance -q   # 按需求域筛选（标记由 conftest 自动打）
-
-# 5) W3 数据报告：模拟/招募 → SQLite → 6 条 SQL 回放（results/w3.db）
+# 3) 数据报告：模拟/招募 → SQLite → 6 条分析 SQL
 python scripts/w3_report.py
 
-# 6) W4 性能基线（results/baseline.json）与调参故事线
+# 4) 性能基线 + 「改数值→红→建议→绿」调参演示
 python scripts/w4_bench.py
 python scripts/w4_tune_demo.py
 
-# 7) W5 AI 三条线 + 每日平衡回归（CI 用；配 AI_HTTP_URL+AI_API_KEY 可切真实 LLM）
+# 5) AI 辅助（本地规则提供者离线可跑；配 AI_HTTP_URL + AI_API_KEY 可切真实 LLM）
 python scripts/w5_ai_demo.py
-python scripts/ci_daily_balance.py
 
-# 8) W6 Allure 报告（路径 A/B 等价；报告已生成于 allure-report/）
-python scripts/export_allure.py --out allure-results   # 路径A：无 pytest 的导出器（纯 stdlib）
-allure generate allure-results -o allure-report --clean
-# 路径B：.venv 自带 pytest + allure-pytest
-#   .venv\Scripts\python.exe -m pytest tests --alluredir=allure-results
-#   allure generate allure-results -o allure-report --clean
+# 6) 每日回归（CI 用，退出码驱动红绿）
+python scripts/ci_daily_balance.py
 ```
 
-- 引擎/测试/脚本本体**零第三方依赖**（stdlib unittest 即可全量回归）；
-  `.venv` 仅在需要 pytest 生态（marker 筛选、allure-pytest 报告）时使用，已 gitignore。
-
-引擎只依赖 Python 标准库，`python>=3.10` 即可（开发于 3.14）。
+> 引擎/测试/脚本本体零第三方依赖（Python ≥ 3.10，stdlib 即可全量回归）；
+> `.venv` 仅用于 pytest 生态（marker 筛选、Allure），已 gitignore。
 
 ## 引擎规则速览（完整条目见需求说明书）
 
@@ -151,23 +101,19 @@ allure generate allure-results -o allure-report --clean
 | 波次 | start_time 起按 interval 生成 count 个（REQ-STG-001） |
 | 胜负 | 漏怪扣生命、归零判负；清场胜利；剩余生命 ≥ 三星线得三星（REQ-STG-003/004/005） |
 | 确定性 | seed 固定 → 逐事件一致（REQ-SIM-001） |
+| 招募 | 基础概率 + 软保底 + 第 cap 抽硬保底（REQ-PRB-001..007） |
 
-## 数据驱动：怎么加一个干员 / 一张关卡
+## 迭代说明
 
-1. 在 `mini_tower/data/operators.json` 追加一个对象（id 全局唯一、数值在域内）；
-2. 在 `stages.json` 引用新敌人/新波次；
-3. 重新跑 `python -m unittest discover -s tests -v` —— loader 的校验就是
-   「坏配置不允许进引擎」的第一道测试门（REQ-CFG-004）；
-4. W2 起，规则测试将逐条断言每个新配置的行为与设计目标一致。
-
-## Roadmap
-
-- ✅ **W1–W6 全部完成 + 审查通过（v0.5.1，79 条测试全绿）**：引擎/冒烟 → 规则矩阵与缺陷复盘 →
-  数值三件套 + SQLite → 性能基线/调参故事线 → AI 三道闸 + 每日回归 CI →
-  Allure 报告（`allure-report/index.html`）/演示脚本/面试工具包
-- 面试素材索引：`docs/w6-demo-script.md`（演示视频）、`docs/w6-interview-kit.md`（简历+追问）、
-  `docs/test-case-matrix.md`（用例↔REQ）、`docs/defects.md`（缺陷复盘）、`docs/review-report.md`（审查）
+本作品按「需求 → 规则测试 → 数值/概率/数据 → 性能/调参 → AI 辅助/CI → 报告收尾」六个阶段迭代完成，
+每阶段均有独立交付与真实数据报告（docs/w3~w5-report.md、review-report.md）。所有内容为原创实现，
+玩法规则仅作方法学载体，不包含任何第三方游戏素材。
 
 ---
 
-> 参考：求职定位与完整制作方案见仓库外文档《鹰角游戏测试校招-项目方向与制作方案.md》。
+## 面向游戏测试岗位
+
+本仓库定位为**游戏测试方向的作品集**，聚焦游戏 QA 的几项核心能力：功能与边界用例设计、
+数值与概率验证、性能基准、自动化与 CI、数据反哺调优、AI 辅助（含防幻觉校验）。
+对目标岗位要求（职责/技能）的**逐条对照**见 [docs/jd-review.md](docs/jd-review.md)；
+作品集讲解与常见问答见 [docs/SHOWCASE.md](docs/SHOWCASE.md)。
