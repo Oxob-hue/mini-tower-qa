@@ -1,0 +1,26 @@
+[
+  {
+    "eid": "walker",
+    "name": "步卒",
+    "hp": 180,
+    "defense": 0,
+    "speed": 0.9,
+    "leak": 1
+  },
+  {
+    "eid": "runner",
+    "name": "游骑",
+    "hp": 120,
+    "defense": 0,
+    "speed": 1.6,
+    "leak": 1
+  },
+  {
+    "eid": "armored",
+    "name": "铁壳",
+    "hp": 1600,
+    "defense": 100,
+    "speed": 0.5,
+    "leak": 2
+  }
+]

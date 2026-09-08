@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+
+# 测试与质量产物（可再生成，不入库）
+.pytest_cache/
+.coverage
+htmlcov/
+allure-results/
+allure-report/
+reports/
+*.log
+
+# IDE
+.idea/
+.vscode/
+
+# results/ 运行时产物（SQLite/基线等）
+results/*
+!results/.gitkeep
+*.db
+*.sqlite
+
+# OS
+Thumbs.db
+.DS_Store

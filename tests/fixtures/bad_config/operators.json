@@ -1,0 +1,16 @@
+[
+  {
+    "oid": "broken",
+    "name": "坏配置",
+    "rarity": 2,
+    "atk": "一百",
+    "interval": 1.0,
+    "range_lo": 0.0,
+    "range_hi": 5.0,
+    "dmg_type": "fire",
+    "crit_rate": 0.0,
+    "crit_mult": 1.5,
+    "skill_every": 0,
+    "skill_mult": 1.0
+  }
+]

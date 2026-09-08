@@ -1,0 +1,44 @@
+name: daily-balance-regression
+
+# 每日 02:00 UTC 定时跑全量测试 + 平衡回归 + 数据报告；也可手动触发
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  balance-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: 安装依赖（pytest 全家桶可选；引擎零第三方依赖）
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: 全量测试（unittest 与 pytest 双兼容，58+ 用例）
+        run: |
+          python -m unittest discover -s tests -v
+
+      - name: 每日平衡回归（确定性，含最强编队漂移检测）
+        run: python scripts/ci_daily_balance.py
+
+      - name: W3 数据报告（模拟/招募 → SQLite → 6 条 SQL）
+        run: python scripts/w3_report.py --db results/w3.db
+
+      - name: 上传产物（SQLite 库 / 基线 / 报告目录）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: balance-artifacts
+          path: |
+            results/*.db
+            results/baseline.json
+            results/*.log
+          if-no-files-found: ignore

@@ -1,0 +1,44 @@
+[
+  {
+    "sid": "1-1",
+    "name": "序章 · 初阵",
+    "path_length": 10.0,
+    "base_hp": 10,
+    "three_star_lives": 8,
+    "waves": [
+      {
+        "enemy_id": "walker",
+        "count": 8,
+        "start_time": 0.0,
+        "interval": 4.0
+      }
+    ]
+  },
+  {
+    "sid": "1-2",
+    "name": "铁壳行进",
+    "path_length": 12.0,
+    "base_hp": 10,
+    "three_star_lives": 7,
+    "waves": [
+      {
+        "enemy_id": "walker",
+        "count": 6,
+        "start_time": 0.0,
+        "interval": 4.0
+      },
+      {
+        "enemy_id": "armored",
+        "count": 3,
+        "start_time": 14.0,
+        "interval": 10.0
+      },
+      {
+        "enemy_id": "walker",
+        "count": 6,
+        "start_time": 40.0,
+        "interval": 3.0
+      }
+    ]
+  }
+]

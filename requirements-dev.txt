@@ -1,0 +1,6 @@
+# 质量保障体系运行依赖（在本地正式环境 / CI 安装；引擎本体零第三方依赖）
+#   python -m pip install -r requirements-dev.txt
+#   python -m pytest tests -v
+pytest>=8.3
+pytest-xdist>=3.6
+allure-pytest>=2.13   # W6：生成 Allure 报告（pytest --alluredir=allure-results）
