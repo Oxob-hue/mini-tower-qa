@@ -1,4 +1,4 @@
-name: daily-balance-regression
+﻿name: daily-balance-regression
 
 # 全量回归：main 提交即触发 + 每日 02:00 UTC 定时 + 手动触发
 # 内容：unittest/pytest 全量用例 → 平衡回归（漂移检测）→ W3 数据报告 → 摘要 + 产物归档
@@ -13,9 +13,9 @@ jobs:
   balance-regression:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
           cache: pip
@@ -65,7 +65,7 @@ jobs:
 
       - name: 上传产物（SQLite 库 / 基线 / 报告目录）
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: balance-artifacts
           path: |

@@ -60,7 +60,7 @@
 | `python scripts/w4_bench.py` | 性能基线 + baseline.json |
 | `python scripts/w4_tune_demo.py` | 「红→建议→绿」完整故事线 |
 | `python scripts/w5_ai_demo.py` | AI 三条线 + 审计闭环 |
-| `python scripts/ci_daily_balance.py` | 平衡回归/漂移检测（退出码驱动 CI 红绿） |
+| `python scripts/ci_daily_balance.py` | 平衡回归/漂移检测（退出码驱动 CI 红绿；FAIL 行直接给出实测 vs 阈值差值） |
 | `python scripts/export_allure.py` | 无 pytest 的 Allure 结果导出 |
 | `.github/workflows/daily-balance.yml` | main 提交即回归 + 每日 02:00 UTC 定时；摘要进 Job Summary、产物归档 artifact |
 

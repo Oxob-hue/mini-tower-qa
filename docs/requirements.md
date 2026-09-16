@@ -153,7 +153,7 @@
 | 编号 | 需求 |
 |---|---|
 | REQ-CI-001 | 每日定时（02:00 UTC）跑全量测试 + 平衡回归（GitHub Actions，.github/workflows/daily-balance.yml） |
-| REQ-CI-002 | 平衡漂移检测脚本（scripts/ci_daily_balance.py）以退出码驱动 CI 红绿；seed 固定、机器无关 |
+| REQ-CI-002 | 平衡漂移检测脚本（scripts/ci_daily_balance.py）以退出码驱动 CI 红绿；seed 固定、机器无关；越界时输出「实测值 vs 阈值 + 差值」，让 FAIL 行自解释 |
 | REQ-CI-003 | CI 产物（SQLite 库/基线/报告）作为 artifact 归档，支持事后比对 |
 | REQ-CI-004 | **main 提交即触发**同一套回归（不等次日定时）；失败摘要写入 Job Summary，用例数由 pytest 收集结果动态给出（避免文案数字过期） |
 
@@ -185,3 +185,4 @@
 | v0.5.0 | W6 | Allure 接入（pytest.ini 标记 + tests/conftest.py epic/feature/story 映射 + w6-allure-guide）；演示视频脚本（w6-demo-script）；简历与面试工具包（w6-interview-kit）；顶层方案文档定稿（真实数字填表） | 回归：tests 79/79 通过 |
 | v0.5.1 | 审查+Allure 报告 | 项目审查：清理 5 处未用导入、抽取 allure_map 单一来源；新增无 pytest 的 Allure 导出器 scripts/export_allure.py 并生成 allure-results + allure-report（79/79 passed）；审查报告 docs/review-report.md | 回归：tests 79/79 通过 |
 | v0.5.2 | CI 修复与文案校准 | **缺陷 BUG-004（CI）**：`actions/setup-python@v5` 的 `cache: pip` 只认 `requirements.txt`/`pyproject.toml`，本仓库用 `requirements-dev.txt` → 缓存键报错使 job 失败、后续测试步骤全部 skip（连续 5 天定时回归红且无人察觉）。修复：`cache-dependency-path: requirements-dev.txt`；同时新增 REQ-CI-004（main 提交即回归 + Job Summary 摘要 + 用例数动态取值），修正文档/步骤名中过期的用例数文案，`ci_daily_balance.py` 强制 stdout UTF-8（修 Windows GBK 控制台下 emoji 抛 UnicodeEncodeError 导致"全 PASS 却 exit 1"的假失败） | 回归：tests 79/79 通过；CI run #9 全绿 |
+| v0.5.3 | CI 可读性与依赖升级 | ① 平衡回归 FAIL 行改为自解释：逐条打印「实测值 vs 阈值 + 差值」（通关率/三星率给差值，时长给"高于上限/低于下限 + 偏离秒数"），并在结尾汇总"n/m 项未通过"（REQ-CI-002 补强）；② Actions 升到当前主版本 `checkout@v7` / `setup-python@v7` / `upload-artifact@v7`，消除 Node 20 弃用告警 | 回归：tests 79/79 通过；越界分支用注入阈值实测（快/慢/三星率三类均打印差值，exit 1），正常路径 5 项全 PASS（exit 0） |
