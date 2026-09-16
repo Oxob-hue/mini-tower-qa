@@ -9,16 +9,16 @@
 `allure-report/index.html`（pytest 路径最新生成：79/79 passed）。查看方式：
 
 ```bash
-allure open D:\GameProtect\mini-tower-qa\allure-report   # 起本地服务打开
+allure open allure-report          # 在仓库根目录执行，起本地服务打开
 # 或直接用浏览器打开 allure-report/index.html（静态页面）
 ```
 
 ## 0b. 激活仓库自带环境（Windows PowerShell）
 
 ```powershell
-D:\GameProtect\mini-tower-qa\.venv\Scripts\Activate.ps1   # 激活后直接 python -m pytest ...
-# 或不用激活，直接全路径调用：
-D:\GameProtect\mini-tower-qa\.venv\Scripts\python.exe -m pytest tests -q
+.venv\Scripts\Activate.ps1         # 在仓库根目录执行；激活后直接 python -m pytest ...
+# 或不用激活，直接调用：
+.venv\Scripts\python.exe -m pytest tests -q
 ```
 
 ## 1. （可选）自行重建环境

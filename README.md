@@ -40,6 +40,7 @@
 - 运行器：stdlib `unittest` 零依赖全量回归；`.venv`（pytest + allure-pytest）用于 marker 筛选与 Allure 报告
 - 环境：`.venv` 已就绪；`allure-report/` 可在本地生成（见 [w6-allure-guide.md](docs/w6-allure-guide.md)，HTML 需以 HTTP 方式打开）
 - 版本：0.5.1（变更记录见 [requirements.md](docs/requirements.md) 文末）
+- CI：`.github/workflows/daily-balance.yml` —— **main 提交即回归 + 每日 02:00 UTC 定时**，跑全量用例 → 平衡漂移检测 → W3 数据报告；结果摘要写入 Job Summary，产物（SQLite/基线/日志）作为 artifact 归档
 
 ## 目录结构
 
@@ -54,7 +55,7 @@ mini-tower-qa/
 ├── sql/analysis.sql               # 6 条平衡/概率分析查询
 ├── scripts/                       # 报告与演示脚本（w3_report / w4_bench / w4_tune_demo / w5_ai_demo / ci_daily_balance / export_allure）
 ├── tests/                         # 79 条用例（8 个测试文件 + conftest/allure_map）
-├── .github/workflows/daily-balance.yml   # 每日定时全量回归 + 平衡漂移检测
+├── .github/workflows/daily-balance.yml   # 提交/每日定时全量回归 + 平衡漂移检测 + 摘要与产物归档
 ├── results/ · allure-results/ · allure-report/ · .venv/   # 运行产物（gitignore）
 └── pytest.ini                     # marker 注册
 ```
@@ -62,8 +63,8 @@ mini-tower-qa/
 ## 快速开始
 
 ```bash
-# 0) 进入项目目录（模块基于当前目录导入）
-cd D:\GameProtect\mini-tower-qa
+# 0) 进入仓库根目录（模块按当前目录导入）
+cd mini-tower-qa
 
 # 1) 引擎演示：3 个参考场景 + 确定性校验
 python -m mini_tower
@@ -82,7 +83,7 @@ python scripts/w4_tune_demo.py
 # 5) AI 辅助（本地规则提供者离线可跑；配 AI_HTTP_URL + AI_API_KEY 可切真实 LLM）
 python scripts/w5_ai_demo.py
 
-# 6) 每日回归（CI 用，退出码驱动红绿）
+# 6) 平衡回归 / 漂移检测（CI 提交与每日定时都跑，退出码驱动红绿）
 python scripts/ci_daily_balance.py
 ```
 

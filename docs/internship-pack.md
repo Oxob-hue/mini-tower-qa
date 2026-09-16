@@ -23,7 +23,7 @@
 · 数据反哺调优：3600 局模拟落 SQLite，6 条 SQL 输出"高防关 1-2 带真伤编队
   0 漏怪 vs 无真伤编队漏 1200/1400"等可直接决策的结论
 · 性能与自动化：单局 0.09ms、同构 ×10 敌人耗时 ×9.9（近线性）；
-  pytest/unittest 双运行器 + GitHub Actions 每日回归
+  pytest/unittest 双运行器 + GitHub Actions 提交/每日全量回归
 · AI 深度使用：需求拆测试点 / 数值风险评估 / 失败日志聚类三条线，
   全部经过 schema 校验 + 引擎实测交叉验证 + 人工审计（防幻觉闭环）
 
@@ -122,7 +122,7 @@ mini-tower-qa/
 ├─ sql/analysis.sql   6 条分析 SQL（Q1~Q6）
 ├─ scripts/           报告/演示脚本（w3_report/w4_bench/w4_tune_demo/w5_ai_demo/ci_daily_balance/export_allure）
 ├─ docs/              需求说明书/用例矩阵/缺陷复盘/各周报告/审查报告/面试工具包
-└─ .github/workflows/ 每日 02:00 UTC 全量回归 + 平衡漂移检测
+└─ .github/workflows/ 提交 + 每日 02:00 UTC 全量回归 + 平衡漂移检测（摘要进 Job Summary、产物归档）
 ```
 
 ### 3.3 六个里程碑（按周，全部有真实产出）
@@ -150,12 +150,12 @@ mini-tower-qa/
 ### 3.5 面试当天 10 分钟自证流程
 
 ```powershell
-cd D:\GameProtect\mini-tower-qa
+cd mini-tower-qa                                      # 进入仓库根目录
 python -m mini_tower                                  # 1) 引擎演示（30 秒）
 python -m unittest discover -s tests                  # 2) 79 条全绿（5 秒）
 python scripts/w4_tune_demo.py                        # 3) 调参故事线（红→建议→绿）
 python scripts/w5_ai_demo.py                          # 4) AI 三道闸 + 审计
-python scripts/ci_daily_balance.py                    # 5) 每日回归/漂移检测
+python scripts/ci_daily_balance.py                    # 5) 平衡回归/漂移检测
 # 打开 allure-report/index.html（用 HTTP，勿用 file://） 6) 报告按 epic→feature 钻取
 ```
 

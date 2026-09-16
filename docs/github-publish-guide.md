@@ -1,8 +1,8 @@
 # GitHub 发布指引（MiniTower QA）
 
 > 目标：把 `mini-tower-qa` 推到 GitHub 并让链接可放进简历。
-> ⚠ 隐私提醒：仓库若设为 **Public**，请**不要把含个人信息的简历放进仓库**；
-> 简历（D:\GameProtect\简历-游戏测试实习.md）保留在本地即可。
+> ⚠ 隐私提醒：仓库若设为 **Public**，请**不要把含个人信息的简历、本机绝对路径放进仓库**；
+> 简历保留在本地（仓库外）即可。
 
 ## 0. 前置
 
@@ -23,7 +23,7 @@
 在 PowerShell 执行（工作目录需为项目根）：
 
 ```powershell
-cd D:\GameProtect\mini-tower-qa
+cd mini-tower-qa
 
 # 1) 初始化并提交（.gitignore 已排除 .venv / results / allure-* 等产物）
 git init -b main

@@ -60,9 +60,9 @@
 | `python scripts/w4_bench.py` | 性能基线 + baseline.json |
 | `python scripts/w4_tune_demo.py` | 「红→建议→绿」完整故事线 |
 | `python scripts/w5_ai_demo.py` | AI 三条线 + 审计闭环 |
-| `python scripts/ci_daily_balance.py` | 每日回归/漂移检测（退出码驱动 CI） |
+| `python scripts/ci_daily_balance.py` | 平衡回归/漂移检测（退出码驱动 CI 红绿） |
 | `python scripts/export_allure.py` | 无 pytest 的 Allure 结果导出 |
-| `.github/workflows/daily-balance.yml` | 每日 02:00 UTC 全量回归 |
+| `.github/workflows/daily-balance.yml` | main 提交即回归 + 每日 02:00 UTC 定时；摘要进 Job Summary、产物归档 artifact |
 
 ### 已生成的环境与产物目录
 | 路径 | 内容 | 是否入库 |
@@ -89,12 +89,12 @@
 ## 4. 面试现场 10 分钟展示流程
 
 ```powershell
-cd D:\GameProtect\mini-tower-qa
+cd mini-tower-qa                          # 进入仓库根目录
 python -m mini_tower                       # ① 引擎演示（3 场景 + 确定性）
 python -m unittest discover -s tests       # ② 79 条全绿（5 秒）
 python scripts/w4_tune_demo.py             # ③ 改数值→红→建议→绿
 python scripts/w5_ai_demo.py               # ④ AI 三道闸 + 审计
-python scripts/ci_daily_balance.py         # ⑤ 每日回归/漂移检测
+python scripts/ci_daily_balance.py         # ⑤ 平衡回归/漂移检测
 # 浏览器(HTTP)打开 allure-report/index.html  # ⑥ 报告按 epic→feature 钻取
 ```
 
@@ -104,4 +104,4 @@ python scripts/ci_daily_balance.py         # ⑤ 每日回归/漂移检测
 - **给自己复述**：internship-pack.md（讲解+话术）→ w6-demo-script.md（视频脚本）
 - **自证数字**：全部走 ③④ 与 tests，禁止背不出来的数
 
-> 复现前提：`cd D:\GameProtect\mini-tower-qa`（在 D:\GameProtect 根目录会找不到模块）。
+> 复现前提：`cd mini-tower-qa`（进入**仓库根目录**再执行；在上一级目录会找不到 `mini_tower` 模块）。

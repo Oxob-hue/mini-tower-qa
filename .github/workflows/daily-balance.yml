@@ -1,6 +1,7 @@
 name: daily-balance-regression
 
-# 每日 02:00 UTC 定时跑全量测试 + 平衡回归 + 数据报告；也可手动触发
+# 全量回归：main 提交即触发 + 每日 02:00 UTC 定时 + 手动触发
+# 内容：unittest/pytest 全量用例 → 平衡回归（漂移检测）→ W3 数据报告 → 摘要 + 产物归档
 on:
   push:
     branches: [main]        # 提交即回归：避免"失败了 5 天才发现"
@@ -27,9 +28,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
-      - name: 全量测试（unittest 与 pytest 双兼容，58+ 用例）
+      - name: 全量测试（unittest / pytest 双运行器，同一批用例）
         run: |
-          python -m unittest discover -s tests -v
+          set -o pipefail
+          python -m unittest discover -s tests -v 2>&1 | tee results/unittest.log
+          # 用例数动态取自 pytest 收集结果，避免文案里的数字过期
+          python -m pytest --collect-only -q 2>&1 | tail -n 1 | tee results/test-count.txt
 
       - name: 每日平衡回归（确定性，含最强编队漂移检测）
         run: |
@@ -46,6 +50,9 @@ jobs:
         run: |
           {
             echo "### daily-balance-regression"
+            echo ""
+            echo "- 用例收集：$(cat results/test-count.txt 2>/dev/null || echo '未执行')"
+            echo "- 全量测试：$(grep -E '^(Ran |OK|FAILED)' results/unittest.log 2>/dev/null | tr '\n' ' ' || echo '未执行')"
             echo ""
             echo "<details><summary>平衡回归输出（尾部 15 行）</summary>"
             echo ""
@@ -65,4 +72,5 @@ jobs:
             results/*.db
             results/baseline.json
             results/*.log
+            results/test-count.txt
           if-no-files-found: ignore

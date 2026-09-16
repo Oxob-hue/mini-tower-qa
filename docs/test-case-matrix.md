@@ -157,4 +157,4 @@
 
 > W5 全量 = 11 条；连同 W1–W4 共 **79 条**，全绿。
 > 报告：`docs/w5-report.md`；复现：`python scripts/w5_ai_demo.py`。
-> CI：`.github/workflows/daily-balance.yml`（每日 02:00 UTC → 全量测试 + `scripts/ci_daily_balance.py` 平衡回归）。
+> CI：`.github/workflows/daily-balance.yml`（main 提交即回归 + 每日 02:00 UTC 定时 → 全量测试 + `scripts/ci_daily_balance.py` 平衡回归 + W3 数据报告；摘要进 Job Summary，产物归档 artifact）。
