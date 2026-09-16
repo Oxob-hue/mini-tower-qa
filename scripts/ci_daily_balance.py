@@ -8,6 +8,14 @@
 import sys
 from pathlib import Path
 
+# Windows 控制台默认 GBK：直接 print(✅/❌) 会抛 UnicodeEncodeError 导致脚本假失败。
+# 统一把 stdout 切到 UTF-8；不支持 reconfigure 的环境（被重定向的旧管道）忽略即可。
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (OSError, ValueError):        # pragma: no cover - 极端环境兜底
+        pass
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 

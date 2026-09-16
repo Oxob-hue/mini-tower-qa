@@ -2,6 +2,8 @@ name: daily-balance-regression
 
 # 每日 02:00 UTC 定时跑全量测试 + 平衡回归 + 数据报告；也可手动触发
 on:
+  push:
+    branches: [main]        # 提交即回归：避免"失败了 5 天才发现"
   schedule:
     - cron: '0 2 * * *'
   workflow_dispatch:
@@ -16,6 +18,9 @@ jobs:
         with:
           python-version: '3.12'
           cache: pip
+          # 修复：仓库没有 requirements.txt / pyproject.toml，
+          # 而 cache: pip 默认只找这两个文件，找不到会直接 fail 并 skip 掉后面所有测试步骤。
+          cache-dependency-path: requirements-dev.txt
 
       - name: 安装依赖（pytest 全家桶可选；引擎零第三方依赖）
         run: |
@@ -27,10 +32,29 @@ jobs:
           python -m unittest discover -s tests -v
 
       - name: 每日平衡回归（确定性，含最强编队漂移检测）
-        run: python scripts/ci_daily_balance.py
+        run: |
+          set -o pipefail                     # 防 tee 吞掉失败退出码
+          python scripts/ci_daily_balance.py 2>&1 | tee results/daily-balance.log
 
       - name: W3 数据报告（模拟/招募 → SQLite → 6 条 SQL）
-        run: python scripts/w3_report.py --db results/w3.db
+        run: |
+          set -o pipefail
+          python scripts/w3_report.py --db results/w3.db 2>&1 | tee results/w3-report.log
+
+      - name: 结果摘要写入 Job Summary
+        if: always()
+        run: |
+          {
+            echo "### daily-balance-regression"
+            echo ""
+            echo "<details><summary>平衡回归输出（尾部 15 行）</summary>"
+            echo ""
+            echo '```text'
+            tail -n 15 results/daily-balance.log 2>/dev/null || echo "(无平衡回归日志)"
+            echo '```'
+            echo ""
+            echo "</details>"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: 上传产物（SQLite 库 / 基线 / 报告目录）
         if: always()
